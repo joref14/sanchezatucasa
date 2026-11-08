@@ -492,6 +492,10 @@ function renderVerdict(c){
     body = `${n===0?'Ahora mismo la derecha no saca ningún escaño aquí.':`Ahora mismo la derecha saca ${n} de ${a.mag} escaños (PP ${sp}, Vox ${sv}).`} Un voto a ${Lp(bp)} es el que más cerca está de sumar ${n===0?'el primero':'uno más'}: se lo quitaría a ${lo}. <b style="color:var(--ink)">${Lp(bp)} está a ${g.x<1?'solo ':''}unos ${vt(g.x,a.mag)} votos</b> de conseguirlo (cifra aproximada).`;
     body += (a.seats[o2]===0) ? ` ${Lp(o2)} no llega a escaño en esta provincia, así que ahí un voto tiene muy pocas opciones de servir.` : ` Un voto a ${Lp(o2)} no consigue ese escaño extra.`;
     hl = bp;
+    if (cls==='warn'){   // fiabilidad media: se mantiene la recomendación, pero se deja claro que el escaño está muy justo
+      head = `En ${name} hay un escaño en juego: ${level==='ganar'?'conviene votar':'el voto más útil es'} ${Lp(bp)}`;
+      body += ` Es un escaño muy justo y puede cambiar con pequeñas variaciones de las encuestas, así que lo importante es que la derecha vaya a votar.`;
+    }
   } else if (n===0){
     head = `${name} es una provincia muy difícil para la derecha`;
     body = `No sale ningún escaño y ganar uno está lejos. Aun así tu voto cuenta en el total de España, así que ve a votar.`;
