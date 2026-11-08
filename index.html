@@ -69,6 +69,16 @@ select{width:100%;font:600 20px var(--f-body);color:var(--ink);background:var(--
 .seats{display:flex;flex-wrap:wrap;gap:3px}
 .seats b{width:20px;height:20px;border-radius:4px;display:block}
 .seats .play{background:transparent!important;border:2px dashed currentColor;width:20px;height:20px}
+.pcard{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:14px 14px 12px;width:100%}
+.ph{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.pk{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.pn{font-size:24px;font-weight:800;line-height:1.15;color:var(--ink)}
+.pm{font-size:13px;color:var(--ink2);white-space:nowrap;padding-bottom:3px}.pm b{font-size:20px;color:var(--ink)}
+.pstrip{display:flex;gap:3px;height:12px;margin:12px 0}.pstrip i{border-radius:4px;min-width:6px}
+.ptiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.pt{background:var(--card);border-radius:10px;border-left:5px solid var(--c);padding:7px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:44px}
+.pt span{font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.2}.pt b{font-size:26px;font-weight:800;color:var(--ink);line-height:1}
+.pwon{margin-top:12px;font-size:11.5px;line-height:1.5;color:var(--mute)}.pwon>span:first-child{font-weight:700}.pwon .nw{white-space:nowrap}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--ink2)}
 .legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
 .note{background:var(--warn-bg);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:14px;font-weight:500}
@@ -555,7 +565,11 @@ function renderMap(c){
   }
   $('map').innerHTML = g + sel + `<path class="brd" d="${MAP.border}"/>`;
   const pr = byName[S.prov];
-  $('maplg').innerHTML = pr ? `<div style="width:100%"><div style="font-size:19px;font-weight:800;color:var(--ink);margin-bottom:8px">${S.prov} · ${pr.mag} escaños</div><div class="legend" style="gap:8px 16px">${ORDER.filter(k=>pr.seats[k]>0).sort((a,b)=>pr.seats[b]-pr.seats[a]||pr.shares[b]-pr.shares[a]).map(k=>`<span style="font-size:18px;font-weight:600;color:var(--ink)"><i style="background:${colp(k)};width:14px;height:14px"></i>${Lp(k)} <b style="font-size:22px">${pr.seats[k]}</b></span>`).join('')}</div><div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--line,rgba(128,128,128,.25))"><div class="lab">Provincias ganadas en España</div><div class="legend" style="gap:4px 12px;margin-top:4px">${ORDER.filter(k=>cnt[k]).sort((a,b)=>cnt[b]-cnt[a]).map(k=>`<span style="font-size:12px;font-weight:500;color:var(--mute,#6b7280)"><i style="background:${col(k)}"></i>${L[k]} ${cnt[k]}</span>`).join('')}</div></div></div>` : '';
+  const prs = pr ? ORDER.filter(k=>pr.seats[k]>0).sort((a,b)=>pr.seats[b]-pr.seats[a]||pr.shares[b]-pr.shares[a]) : [];
+  $('maplg').innerHTML = pr ? `<div class="pcard"><div class="ph"><div><div class="pk">Provincia seleccionada</div><div class="pn">${S.prov}</div></div><div class="pm"><b>${pr.mag}</b> escaños</div></div>
+    <div class="pstrip">${prs.map(k=>`<i style="flex:${pr.seats[k]};background:${colp(k)}" title="${Lp(k)} ${pr.seats[k]}"></i>`).join('')}</div>
+    <div class="ptiles">${prs.map(k=>`<div class="pt" style="--c:${colp(k)}"><span>${Lp(k)}</span><b>${pr.seats[k]}</b></div>`).join('')}</div>
+    <div class="pwon"><span>Provincias ganadas en España:</span> ${ORDER.filter(k=>cnt[k]).sort((a,b)=>cnt[b]-cnt[a]).map(k=>`<span class="nw">${L[k]} ${cnt[k]}</span>`).join(' · ')}</div></div>` : '';
   $('map').onclick = e => { const p = e.target.closest('path[data-p]'); if (!p) return; S.prov = p.dataset.p; sync(); };
 }
 // tendencia semanal
