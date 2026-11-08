@@ -373,7 +373,7 @@ const Lp = k => (k==='pp' && S.prov==='Navarra') ? 'PP-UPN' : L[k];   // en Nava
 const BLOCNAME = {right:'la derecha', left:'la izquierda'};
 const ELECTION = Date.UTC(2026,10,29,0,0), BAN = Date.UTC(2026,10,23,23,0);
 const banned = Date.now() >= BAN;
-let S = {prov:'Madrid', party:'none', bloc:'right', src:'nosw', scen:'base', view:'party'};
+let S = {prov:'A Coruña', party:'none', bloc:'right', src:'nosw', scen:'base', view:'party'};
 try { const x = JSON.parse(localStorage.getItem('v29n2')||'{}'); Object.assign(S, x); } catch(e){}
 S.bloc = 'right';
 function save(){ try{ localStorage.setItem('v29n2', JSON.stringify(S)); }catch(e){} }
@@ -602,7 +602,7 @@ $('src').onchange=e=>{S.src=e.target.value;tIdx=null;sync()};
 $('scen').onchange=e=>{S.scen=e.target.value;sync()};
 $('v-party').onclick=()=>{S.view='party';tIdx=null;sync()};
 $('v-bloc').onclick=()=>{S.view='bloc';tIdx=null;sync()};
-if(!D.provinces.find(p=>p.name===S.prov)) S.prov='Madrid';
+if(!D.provinces.find(p=>p.name===S.prov)) S.prov='A Coruña';
 if(!banned) renderPolls();
 sync();
 })();
