@@ -143,9 +143,10 @@ details{min-width:0}
       <div class="sl" id="seatlist"></div>
       <div class="foot" id="natfoot"></div>
       <div class="lab" style="margin-top:6px">Quién gana en cada provincia</div>
+      <div class="foot" style="margin:0 0 4px"><b>Toca una provincia para verla.</b></div>
       <svg id="map" viewBox="0 0 360 320" width="100%" role="img" aria-label="Mapa de provincias coloreado por el partido con más votos estimados"></svg>
       <div class="legend" id="maplg"></div>
-      <div class="foot">Color: partido con más votos estimados en cada provincia. Toca una para ver sus escaños y su análisis arriba. Navarra va en azul más oscuro porque el PP se presenta junto a UPN (PP-UPN).</div>
+      <div class="foot">Color: partido con más votos estimados en cada provincia. Al tocar una provincia ves aquí debajo sus escaños; su análisis completo está arriba. Navarra va en azul más oscuro porque el PP se presenta junto a UPN (PP-UPN).</div>
     </section>
 
     <section class="card">
@@ -525,7 +526,7 @@ function renderMap(c){
   $('map').innerHTML = g + sel + `<path class="brd" d="${MAP.border}"/>`;
   const pr = byName[S.prov];
   $('maplg').innerHTML = pr ? `<div style="width:100%"><div class="lab" style="margin-bottom:6px">${S.prov} · ${pr.mag} escaños</div><div class="legend" style="gap:6px 14px">${ORDER.filter(k=>pr.seats[k]>0).sort((a,b)=>pr.seats[b]-pr.seats[a]||pr.shares[b]-pr.shares[a]).map(k=>`<span style="font-size:15px;color:var(--ink)"><i style="background:${colp(k)}"></i>${k==='pp'&&S.prov==='Navarra'?'PP-UPN':L[k]} <b>${pr.seats[k]}</b></span>`).join('')}</div><div style="margin-top:10px"><div class="lab" style="color:var(--ink)">Provincias ganadas en España</div><div class="legend" style="gap:6px 14px;margin-top:6px">${ORDER.filter(k=>cnt[k]).sort((a,b)=>cnt[b]-cnt[a]).map(k=>`<span style="font-size:15px;font-weight:600;color:var(--ink)"><i style="background:${col(k)}"></i>${L[k]} ${cnt[k]}</span>`).join('')}</div></div></div>` : '';
-  $('map').onclick = e => { const p = e.target.closest('path[data-p]'); if (!p) return; S.prov = p.dataset.p; sync(); window.scrollTo({top:0,behavior:'smooth'}); };
+  $('map').onclick = e => { const p = e.target.closest('path[data-p]'); if (!p) return; S.prov = p.dataset.p; sync(); };
 }
 // tendencia semanal
 let tIdx = null;
