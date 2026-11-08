@@ -239,6 +239,16 @@ details{min-width:0}
     for (const k of rest) o[k] -= d * o[k] / restSum;
     o[party] = nv; return o;
   }
+  // mueve `delta` puntos de un bloque al otro, repartidos en proporcion a lo que tiene cada partido
+  function shiftBloc(t, bloc, delta) {
+    const o = Object.assign({}, t);
+    const gain = BLOCS[bloc].filter(k => k in o), lose = BLOCS[bloc === 'right' ? 'left' : 'right'].filter(k => k in o);
+    const gs = sum(o, gain), ls = sum(o, lose);
+    const d = Math.max(-gs * 0.5, Math.min(delta, ls * 0.5));
+    for (const k of gain) o[k] += d * o[k] / gs;
+    for (const k of lose) o[k] -= d * o[k] / ls;
+    return o;
+  }
   function nat23(base) {
     const n = Object.assign({}, base);
     n.pp += 0.21; // UPN (se presenta junto al PP)
@@ -311,12 +321,12 @@ details{min-width:0}
 
   const SCEN = [
     { id: 'base', label: 'Encuestas tal cual', fn: t => t },
-    { id: 'vox+2', label: 'Vox +2 puntos', fn: t => shiftTargets(t, 'vox', 2) },
-    { id: 'vox-2', label: 'Vox −2 puntos', fn: t => shiftTargets(t, 'vox', -2) },
-    { id: 'pp+2', label: 'PP +2 puntos', fn: t => shiftTargets(t, 'pp', 2) },
-    { id: 'pp-2', label: 'PP −2 puntos', fn: t => shiftTargets(t, 'pp', -2) },
-    { id: 'psoe+2', label: 'PSOE +2 puntos', fn: t => shiftTargets(t, 'psoe', 2) },
-    { id: 'psoe-2', label: 'PSOE −2 puntos', fn: t => shiftTargets(t, 'psoe', -2) },
+    { id: 'r1', label: 'La derecha sube 1 punto (la izquierda baja)', fn: t => shiftBloc(t, 'right', 1) },
+    { id: 'r2', label: 'La derecha sube 2 puntos (la izquierda baja)', fn: t => shiftBloc(t, 'right', 2) },
+    { id: 'r3', label: 'La derecha sube 3 puntos (la izquierda baja)', fn: t => shiftBloc(t, 'right', 3) },
+    { id: 'l1', label: 'La izquierda sube 1 punto (la derecha baja)', fn: t => shiftBloc(t, 'left', 1) },
+    { id: 'l2', label: 'La izquierda sube 2 puntos (la derecha baja)', fn: t => shiftBloc(t, 'left', 2) },
+    { id: 'l3', label: 'La izquierda sube 3 puntos (la derecha baja)', fn: t => shiftBloc(t, 'left', 3) },
   ];
   // escenarios para medir robustez (error razonable de encuestas ~1,5 pp)
   const ROBUST = [
@@ -603,6 +613,7 @@ $('scen').onchange=e=>{S.scen=e.target.value;sync()};
 $('v-party').onclick=()=>{S.view='party';tIdx=null;sync()};
 $('v-bloc').onclick=()=>{S.view='bloc';tIdx=null;sync()};
 if(!D.provinces.find(p=>p.name===S.prov)) S.prov='A Coruña';
+if(!M.SCEN.find(s=>s.id===S.scen)) S.scen='base';
 if(!banned) renderPolls();
 sync();
 })();
