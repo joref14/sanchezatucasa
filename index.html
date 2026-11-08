@@ -443,7 +443,7 @@ const conf = r => r>=0.7?['Confianza alta','ok']:['Confianza media','warn'];
 const fmt = x => x.toFixed(1).replace('.',',');
 
 function seatRow(a, extra){
-  const order = ['pp','vox','psoe','sumar','erc','junts','bildu','pnv','bng','cc'].sort((x,y)=>a.seats[y]-a.seats[x]||a.shares[y]-a.shares[x]);
+  const order = ['pp','vox','psoe','sumar','podemos','adelante','erc','junts','bildu','pnv','bng','cc'].sort((x,y)=>a.seats[y]-a.seats[x]||a.shares[y]-a.shares[x]);
   let html = '', used = {};
   for (const k of order) for (let i=0;i<a.seats[k];i++){ html += `<b style="background:${colp(k)}" title="${Lp(k)}"></b>`; used[k]=1; }
   if (extra) html += `<b class="play" style="color:${col(extra)}" title="Escaño en juego para ${Lp(extra)}"></b>`;
