@@ -172,7 +172,7 @@ details{min-width:0}
 
     <section class="card" id="e23card">
       <h3>¿Y si pasa como en 2023?</h3>
-      <div class="foot" style="margin:0">En el 23J las encuestas de la última semana (media de una por casa) dejaron al PSOE unos 3 puntos por debajo de su resultado. ¿Qué pasaría hoy si el error se repitiera?</div>
+      <div class="foot" style="margin:0">En el 23J las encuestas de la última semana (media de 8 casas) dejaron al PSOE unos 3 puntos por debajo de su resultado. ¿Qué pasaría hoy si el error se repitiera?</div>
       <div class="lab">23J: lo que decían las encuestas y lo que pasó</div>
       <svg id="e23a" viewBox="0 0 360 126" width="100%" role="img" aria-label="Encuestas del 23J frente al resultado real"></svg>
       <div class="lab">Hoy: encuestas y con el mismo error</div>
@@ -181,7 +181,7 @@ details{min-width:0}
       <svg id="e23c" viewBox="0 0 360 118" width="100%" role="img" aria-label="Escaños hoy y con el error del 23J"></svg>
       <div class="legend" id="e23l"></div>
       <div class="ro" id="e23t"></div>
-      <div class="foot">Círculo vacío: encuesta. Círculo lleno: resultado real (arriba) o encuesta corregida con el error del 23J (abajo). Es un escenario, no una predicción: un solo error histórico no garantiza que se repita. El error del PSOE se resta del resto en proporción. Fuente de 2023: Wikipedia, encuestas de la última semana, una por casa, con resultado oficial.</div>
+      <div class="foot">Círculo vacío: encuesta. Círculo lleno: resultado real (arriba) o encuesta corregida con el error del 23J (abajo). Es un escenario, no una predicción: un solo error histórico no garantiza que se repita. El error del PSOE se resta del resto en proporción. Fuente de 2023: Wikipedia, encuestas de la última semana de 8 casas (Ipsos, GESOP, Target Point, SocioMétrica, GAD3, Sigma Dos, 40dB, Metroscopia), sin paneles online ni encuestas de medios con sesgo conocido, con el mismo criterio que en 2026.</div>
     </section>
 
     <section class="card">
@@ -285,12 +285,12 @@ details{min-width:0}
     return o;
   }
   // remontada tipo 2023: suma a cada partido lo que se equivoco la media de encuestas de la ultima semana en el 23J
-  // (media de una encuesta por casa; resultado - media: PSOE +3,0, PP -0,8, Vox -0,7, Sumar -1,0)
+  // (media de 8 casas sin paneles online ni encuestas de medios con sesgo conocido; resultado - media: PSOE +3,0, PP -1,0, Vox -0,2, Sumar -0,7)
   function err23(t, f) {
     const o = Object.assign({}, t);
-    o.psoe += 3.0 * f; o.pp -= 0.8 * f; o.vox -= 0.7 * f;
+    o.psoe += 3.0 * f; o.pp -= 1.0 * f; o.vox -= 0.2 * f;
     const sp = (o.sumar || 0) + (o.podemos || 0);
-    if (sp > 0) { const d = 1.0 * f; o.sumar -= d * o.sumar / sp; if ('podemos' in o) o.podemos -= d * o.podemos / sp; }
+    if (sp > 0) { const d = 0.7 * f; o.sumar -= d * o.sumar / sp; if ('podemos' in o) o.podemos -= d * o.podemos / sp; }
     return o;
   }
   function nat23(base) {
@@ -635,7 +635,7 @@ function renderE23(){
     });
     $(id).innerHTML=g;
   };
-  dumb('e23a',[['PSOE','psoe',28.7,31.7],['PP','pp',33.9,33.1],['Vox','vox',13.1,12.4],['Sumar','sumar',13.3,12.3]]);
+  dumb('e23a',[['PSOE','psoe',28.7,31.7],['PP','pp',34.1,33.1],['Vox','vox',12.6,12.4],['Sumar','sumar',13.0,12.3]]);
   const fa=t=>t.sumar+t.podemos;
   dumb('e23b',[['PSOE','psoe',T0.psoe,T1.psoe],['PP','pp',T0.pp,T1.pp],['Vox','vox',T0.vox,T1.vox],['FA + Podemos','sumar',fa(T0),fa(T1)]]);
   // escaños
