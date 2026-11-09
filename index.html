@@ -147,7 +147,6 @@ details{min-width:0}
         <label>Fuente de encuestas <b style="display:block;font-size:10.5px;font-weight:700;letter-spacing:.01em;text-transform:none;line-height:1.35;color:var(--ink2);margin-top:2px">*SW Demoscopia es un valor atípico: se aleja mucho de las otras 12 casas. Según The Objective y El Español, la dirige Juan Miguel Becerra, exdirigente del PSOE (ver nota al final).</b><select id="src"></select></label>
         <label>¿Y si las encuestas se equivocan?<select id="scen"></select></label>
       </div>
-      <div id="scennote" style="display:none;font-size:12.5px;line-height:1.4;color:var(--ink2);margin:2px 0 8px"></div>
       <div class="big" id="nat"></div>
       <div id="natseats"></div>
       <div class="lab" style="margin-top:4px">Escaños por partido (PP incluye UPN)</div>
@@ -169,6 +168,20 @@ details{min-width:0}
       <svg id="trend" viewBox="0 0 360 246" width="100%" role="img" aria-label="Evolución de la media de encuestas desde el 6 de octubre"></svg>
       <div class="legend" id="tl"></div>
       <div class="foot"><span id="trsrc">Un punto por semana, con la media de las 12 casas sin SW Demoscopia.</span> La raya marca el accidente de Urda (28 oct). Las encuestas con trabajo de campo anterior al 28 pueden aparecer en puntos posteriores.</div>
+    </section>
+
+    <section class="card" id="e23card">
+      <h3>¿Y si pasa como en 2023?</h3>
+      <div class="foot" style="margin:0">En el 23J las encuestas de la última semana (media de una por casa) dejaron al PSOE unos 3 puntos por debajo de su resultado. ¿Qué pasaría hoy si el error se repitiera?</div>
+      <div class="lab">23J: lo que decían las encuestas y lo que pasó</div>
+      <svg id="e23a" viewBox="0 0 360 126" width="100%" role="img" aria-label="Encuestas del 23J frente al resultado real"></svg>
+      <div class="lab">Hoy: encuestas y con el mismo error</div>
+      <svg id="e23b" viewBox="0 0 360 126" width="100%" role="img" aria-label="Encuestas de hoy y con el error del 23J"></svg>
+      <div class="lab">Escaños (la raya marca los 176 de la mayoría)</div>
+      <svg id="e23c" viewBox="0 0 360 118" width="100%" role="img" aria-label="Escaños hoy y con el error del 23J"></svg>
+      <div class="legend" id="e23l"></div>
+      <div class="ro" id="e23t"></div>
+      <div class="foot">Círculo vacío: encuesta. Círculo lleno: resultado real (arriba) o encuesta corregida con el error del 23J (abajo). Es un escenario, no una predicción: un solo error histórico no garantiza que se repita. El error del PSOE se resta del resto en proporción. Fuente de 2023: Wikipedia, encuestas de la última semana, una por casa, con resultado oficial.</div>
     </section>
 
     <section class="card">
@@ -367,8 +380,6 @@ details{min-width:0}
     { id: 'l1', label: 'La izquierda sube 1 punto (la derecha baja)', fn: t => shiftBloc(t, 'left', 1) },
     { id: 'l2', label: 'La izquierda sube 2 puntos (la derecha baja)', fn: t => shiftBloc(t, 'left', 2) },
     { id: 'l3', label: 'La izquierda sube 3 puntos (la derecha baja)', fn: t => shiftBloc(t, 'left', 3) },
-    { id: 'e23', label: 'Remontada como en 2023 (el PSOE sube 3 puntos)', fn: t => err23(t, 1) },
-    { id: 'e23h', label: 'La mitad de la remontada de 2023', fn: t => err23(t, 0.5) },
   ];
   // escenarios para medir robustez (error razonable de encuestas ~1,5 pp)
   const ROBUST = [
@@ -410,7 +421,7 @@ details{min-width:0}
     return t;
   }
   const M = { PARTIES, BLOCS, dhondt, makeTargets, shiftTargets, nat23, projectProvince, analyse, extraNeeded,
-    bestTransfer, run, totals, SCEN, ROBUST };
+    bestTransfer, run, totals, SCEN, ROBUST, err23 };
   if (typeof module !== 'undefined' && module.exports) module.exports = M; else root.M = M;
 })(typeof window !== 'undefined' ? window : this);
 </script>
@@ -606,6 +617,42 @@ function weekly(){
   for (let i = tr.length-1; i >= 0 && out.length < 5; i -= 7) out.unshift(tr[i]);
   return out.map(d => Object.assign({t: Date.parse(d.date+'T00:00:00Z')}, d));
 }
+
+function renderE23(){
+  let avg = D.avg; if (S.src==='nosw') avg=D.avg_nosw; else if (S.src!=='avg'){const p=D.latest.find(p=>p.pollster===S.src); if(p) avg=p.shares;}
+  const T0 = M.makeTargets(avg, D.avg), T1 = M.err23(T0,1);
+  const W=360, ml=104, mr=44, lo=8, hi=36, x=v=>ml+(W-ml-mr)*(v-lo)/(hi-lo);
+  const sg = d => (d>0?'+':'−')+fmt(Math.abs(d));
+  const dumb = (id, rows) => {
+    let g='';
+    rows.forEach((r,i)=>{const y=16+i*30;
+      g+=`<text x="${ml-12}" y="${y+1}" text-anchor="end" style="font-weight:700;fill:var(--ink)">${r[0]}</text>`;
+      g+=`<text x="${ml-12}" y="${y+14}" text-anchor="end" style="font-size:10.5px;fill:var(--ink2)">${fmt(r[2])} → ${fmt(r[3])}</text>`;
+      g+=`<line x1="${x(r[2])}" x2="${x(r[3])}" y1="${y}" y2="${y}" stroke="${col(r[1])}" stroke-width="3" stroke-linecap="round"/>`;
+      g+=`<circle cx="${x(r[2])}" cy="${y}" r="5" fill="var(--card)" stroke="${col(r[1])}" stroke-width="2.5"/>`;
+      g+=`<circle cx="${x(r[3])}" cy="${y}" r="5.5" fill="${col(r[1])}"/>`;
+      g+=`<text x="${W-mr+8}" y="${y+4}" style="font-weight:700;fill:var(--ink)">${sg(r[3]-r[2])}</text>`;
+    });
+    $(id).innerHTML=g;
+  };
+  dumb('e23a',[['PSOE','psoe',28.7,31.7],['PP','pp',33.9,33.1],['Vox','vox',13.1,12.4],['Sumar','sumar',13.3,12.3]]);
+  const fa=t=>t.sumar+t.podemos;
+  dumb('e23b',[['PSOE','psoe',T0.psoe,T1.psoe],['PP','pp',T0.pp,T1.pp],['Vox','vox',T0.vox,T1.vox],['FA + Podemos','sumar',fa(T0),fa(T1)]]);
+  // escaños
+  const r0=M.totals(M.run(D,T0,'right',{robust:false})), r1=M.totals(M.run(D,T1,'right',{robust:false}));
+  const bw=W-28, sx=n=>14+bw*n/350;
+  const bar=(t,y)=>{let g='',acc=0;const keys=ORDER.concat(['otros']);
+    for(const k of keys){const n=t[k]||0; if(!n) continue; g+=`<rect x="${sx(acc)}" y="${y}" width="${Math.max(0,sx(acc+n)-sx(acc)-0.6)}" height="26" fill="${col(k)}"/>`;
+      if(n>=22) g+=`<text x="${(sx(acc)+sx(acc+n))/2}" y="${y+17}" text-anchor="middle" style="font-weight:700;fill:#fff;font-size:12px">${n}</text>`; acc+=n;}
+    return g;};
+  let g=`<text x="14" y="14" style="font-weight:700;fill:var(--ink)">Hoy</text>`+bar(r0,20);
+  g+=`<text x="14" y="68" style="font-weight:700;fill:var(--ink)">Con el error del 23J</text>`+bar(r1,74);
+  g+=`<line x1="${sx(176)}" x2="${sx(176)}" y1="16" y2="106" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="4 3"/><text x="${sx(176)}" y="116" text-anchor="middle" style="font-weight:600;fill:var(--ink);font-size:10.5px">176</text>`;
+  $('e23c').innerHTML=g;
+  $('e23l').innerHTML=[['pp','PP'],['vox','Vox'],['psoe','PSOE'],['sumar','Frente Amplio'],['erc','Resto']].map(s=>`<span><i style="background:${col(s[0])}"></i>${s[1]}</span>`).join('');
+  const L=t=>t.psoe+t.sumar+t.podemos+t.adelante+t.erc+t.bildu+t.bng;
+  $('e23t').innerHTML=`<b>PP+Vox:</b> ${r0.pp+r0.vox} → ${r1.pp+r1.vox} escaños · <b>PSOE:</b> ${r0.psoe} → ${r1.psoe} · <b>PP:</b> ${r0.pp} → ${r1.pp}. `+((r1.pp+r1.vox)>=176?'La derecha seguiría teniendo mayoría absoluta.':'La derecha se quedaría sin mayoría absoluta.');
+}
 function renderTrend(){
   $('trsrc').textContent = 'Un punto por semana, con la media de '+(S.src==='nosw'?'las 12 casas sin SW Demoscopia.':'las 13 casas.');
   const tr = weekly(), svg = $('trend');
@@ -663,10 +710,7 @@ function sync(){
   $('prov').value=S.prov; $('src').value=S.src; $('scen').value=S.scen;  $('v-party').setAttribute('aria-pressed',S.view==='party'); $('v-bloc').setAttribute('aria-pressed',S.view==='bloc');
   save();
   if(banned) return;
-  const sn=$('scennote'), e23=S.scen==='e23'||S.scen==='e23h';
-  sn.style.display=e23?'block':'none';
-  if(e23) sn.textContent = (S.scen==='e23'?'En el 23J las encuestas de la última semana (media de una por casa) se quedaron cortas con el PSOE en unos 3 puntos y se pasaron con el PP (0,8), Vox (0,7) y Sumar (1,0). Aquí se aplica ese mismo error a las encuestas de hoy.':'Aquí se aplica la mitad del error de las encuestas en el 23J: PSOE +1,5, PP −0,4, Vox −0,35, Frente Amplio y Podemos −0,5 entre los dos. Que se repita no es lo habitual: es un escenario, no una predicción.');
-  const c=compute(); renderVerdict(c); renderNat(c); renderRank(c); renderTrend();
+  const c=compute(); renderVerdict(c); renderNat(c); renderRank(c); renderTrend(); renderE23();
   try{ history.replaceState(null,'','#'+slug(S.prov)); }catch(e){}
 }
 $('prov').onchange=e=>{S.prov=e.target.value;sync()};
