@@ -147,6 +147,7 @@ details{min-width:0}
         <label>Fuente de encuestas <b style="display:block;font-size:10.5px;font-weight:700;letter-spacing:.01em;text-transform:none;line-height:1.35;color:var(--ink2);margin-top:2px">*SW Demoscopia es un valor atípico: se aleja mucho de las otras 12 casas. Según The Objective y El Español, la dirige Juan Miguel Becerra, exdirigente del PSOE (ver nota al final).</b><select id="src"></select></label>
         <label>¿Y si las encuestas se equivocan?<select id="scen"></select></label>
       </div>
+      <div id="scennote" style="display:none;font-size:12.5px;line-height:1.4;color:var(--ink2);margin:2px 0 8px"></div>
       <div class="big" id="nat"></div>
       <div id="natseats"></div>
       <div class="lab" style="margin-top:4px">Escaños por partido (PP incluye UPN)</div>
@@ -270,6 +271,15 @@ details{min-width:0}
     for (const k of lose) o[k] -= d * o[k] / ls;
     return o;
   }
+  // remontada tipo 2023: suma a cada partido lo que se equivoco la media de encuestas de la ultima semana en el 23J
+  // (media de una encuesta por casa; resultado - media: PSOE +3,0, PP -0,8, Vox -0,7, Sumar -1,0)
+  function err23(t, f) {
+    const o = Object.assign({}, t);
+    o.psoe += 3.0 * f; o.pp -= 0.8 * f; o.vox -= 0.7 * f;
+    const sp = (o.sumar || 0) + (o.podemos || 0);
+    if (sp > 0) { const d = 1.0 * f; o.sumar -= d * o.sumar / sp; if ('podemos' in o) o.podemos -= d * o.podemos / sp; }
+    return o;
+  }
   function nat23(base) {
     const n = Object.assign({}, base);
     n.pp += 0.21; // UPN (se presenta junto al PP)
@@ -357,6 +367,8 @@ details{min-width:0}
     { id: 'l1', label: 'La izquierda sube 1 punto (la derecha baja)', fn: t => shiftBloc(t, 'left', 1) },
     { id: 'l2', label: 'La izquierda sube 2 puntos (la derecha baja)', fn: t => shiftBloc(t, 'left', 2) },
     { id: 'l3', label: 'La izquierda sube 3 puntos (la derecha baja)', fn: t => shiftBloc(t, 'left', 3) },
+    { id: 'e23', label: 'Remontada como en 2023 (el PSOE sube 3 puntos)', fn: t => err23(t, 1) },
+    { id: 'e23h', label: 'La mitad de la remontada de 2023', fn: t => err23(t, 0.5) },
   ];
   // escenarios para medir robustez (error razonable de encuestas ~1,5 pp)
   const ROBUST = [
@@ -651,6 +663,9 @@ function sync(){
   $('prov').value=S.prov; $('src').value=S.src; $('scen').value=S.scen;  $('v-party').setAttribute('aria-pressed',S.view==='party'); $('v-bloc').setAttribute('aria-pressed',S.view==='bloc');
   save();
   if(banned) return;
+  const sn=$('scennote'), e23=S.scen==='e23'||S.scen==='e23h';
+  sn.style.display=e23?'block':'none';
+  if(e23) sn.textContent = (S.scen==='e23'?'En el 23J las encuestas de la última semana (media de una por casa) se quedaron cortas con el PSOE en unos 3 puntos y se pasaron con el PP (0,8), Vox (0,7) y Sumar (1,0). Aquí se aplica ese mismo error a las encuestas de hoy.':'Aquí se aplica la mitad del error de las encuestas en el 23J: PSOE +1,5, PP −0,4, Vox −0,35, Frente Amplio y Podemos −0,5 entre los dos. Que se repita no es lo habitual: es un escenario, no una predicción.');
   const c=compute(); renderVerdict(c); renderNat(c); renderRank(c); renderTrend();
   try{ history.replaceState(null,'','#'+slug(S.prov)); }catch(e){}
 }
