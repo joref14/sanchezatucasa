@@ -160,13 +160,13 @@ details{min-width:0}
       <div class="foot">Color: partido con más votos estimados en cada provincia. Al tocar una provincia ves aquí debajo sus escaños; su análisis completo está arriba. Navarra va en azul más oscuro porque el PP se presenta junto a UPN (PP-UPN).</div>
     </section>
 
-    <section class="card">
+    <section class="card" style="border:2px solid var(--ink)">
       <div class="row" style="justify-content:space-between;align-items:center">
-        <h3>Tendencia desde la convocatoria</h3>
+        <h3>📈 Tendencia desde la convocatoria</h3>
         <div class="chips"><button class="chip" id="v-party" aria-pressed="true">Partidos</button><button class="chip" id="v-bloc" aria-pressed="false">Bloques</button></div>
       </div>
       <div class="ro" id="ro"></div>
-      <svg id="trend" viewBox="0 0 360 246" width="100%" role="img" aria-label="Evolución de la media de encuestas desde el 6 de octubre"></svg>
+      <svg id="trend" viewBox="0 0 360 340" width="100%" role="img" aria-label="Evolución de la media de encuestas desde el 6 de octubre"></svg>
       <div class="legend" id="tl"></div>
       <div class="foot"><span id="trsrc">Un punto por semana, con la media de las 12 casas sin SW Demoscopia.</span> La raya marca el accidente de Urda (28 oct). Las encuestas con trabajo de campo anterior al 28 pueden aparecer en puntos posteriores.</div>
     </section>
@@ -660,7 +660,7 @@ function renderTrend(){
   const series = S.view==='party'
     ? [['pp','PP',d=>d.pp],['vox','Vox',d=>d.vox],['psoe','PSOE',d=>d.psoe],['sumar','Frente Amplio',d=>d.sumar],['podemos','Podemos',d=>d.podemos]]
     : [['pp','PP+Vox',d=>d.pp+d.vox],['psoe','PSOE+FA+Podemos',d=>d.psoe+d.sumar+d.podemos]];
-  const W=360,H=246,ml=30,mr=14,mt=26,mb=36;
+  const W=360,H=340,ml=30,mr=14,mt=30,mb=36;
   let lo=1e9,hi=-1e9; series.forEach(s=>tr.forEach(d=>{const v=s[2](d);lo=Math.min(lo,v);hi=Math.max(hi,v)}));
   lo=Math.max(0,Math.floor((lo-2)/5)*5); hi=Math.ceil((hi+3)/5)*5;
   const t0=tr[0].t, t1=tr[tr.length-1].t;
@@ -673,10 +673,10 @@ function renderTrend(){
   g+=`<line x1="${x(EVENT)}" x2="${x(EVENT)}" y1="${mt-4}" y2="${H-mb}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="4 3"/><text x="${x(EVENT)}" y="${mt-12}" text-anchor="middle" style="font-weight:600;fill:var(--ink)">28 oct · Urda</text>`;
   series.forEach(s=>{
     const pts=tr.map((d,i)=>`${i?'L':'M'}${x(d.t).toFixed(1)},${y(s[2](d)).toFixed(1)}`).join('');
-    g+=`<path d="${pts}" fill="none" stroke="${col(s[0])}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+    g+=`<path d="${pts}" fill="none" stroke="${col(s[0])}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
     tr.forEach((d,i)=>{const v=s[2](d);
-      g+=`<circle cx="${x(d.t)}" cy="${y(v)}" r="3.5" fill="${col(s[0])}" stroke="var(--card)" stroke-width="2"/>`;
-      g+=`<text x="${x(d.t)}" y="${y(v)-8}" text-anchor="middle" style="font-weight:600;fill:var(--ink);font-size:10.5px;paint-order:stroke;stroke:var(--card);stroke-width:3px">${fmt(v)}</text>`;});
+      g+=`<circle cx="${x(d.t)}" cy="${y(v)}" r="4" fill="${col(s[0])}" stroke="var(--card)" stroke-width="2"/>`;
+      g+=`<text x="${x(d.t)}" y="${y(v)-8}" text-anchor="middle" style="font-weight:700;fill:var(--ink);font-size:11.5px;paint-order:stroke;stroke:var(--card);stroke-width:3px">${fmt(v)}</text>`;});
   });
   svg.innerHTML=g;
   $('tl').innerHTML=series.map(s=>`<span><i style="background:${col(s[0])}"></i>${s[1]}</span>`).join('');
